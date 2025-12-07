@@ -3,30 +3,32 @@ package main
 import (
 	"context"
 	"dotnetApiGenerator/dotnetproject"
+	"flag"
 	"fmt"
+	"log"
 )
 
 func main() {
 	ctx := context.Background()
 	fmt.Print("Enter project name: ")
 
-	var projectName string
-	_, err := fmt.Scanln(&projectName)
-	if err != nil {
-		panic("failed to read project name input")
+	projectName := flag.String("name", "", "Name of the project/solution")
+	location := flag.String("location", "", "Output location for the solution")
+
+	flag.Parse()
+
+	if *projectName == "" {
+		log.Fatal("missing required flag: --name")
 	}
 
-	var location string
-	fmt.Print("Enter location: ")
-	_, err = fmt.Scanln(&location)
-	if err != nil {
-		panic("failed to read location input")
+	if *location == "" {
+		log.Fatal("missing required flag: --location")
 	}
 
 	fmt.Println("Starting generation process...")
 	fmt.Println()
 
-	projectNames := dotnetproject.GenerateProjectNames(projectName)
+	projectNames := dotnetproject.GenerateProjectNames(*projectName)
 	dotnetProjects := make([]*dotnetproject.DotnetProject, 0, len(projectNames))
 
 	fmt.Println(len(projectNames), "projects will be created in", location, ":")
@@ -38,7 +40,7 @@ func main() {
 
 	fmt.Println()
 
-	err = dotnetproject.GenerateDotnetSolution(ctx, projectName, location)
+	err := dotnetproject.GenerateDotnetSolution(ctx, *projectName, *location)
 	if err != nil {
 		fmt.Println(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 )
 
@@ -42,8 +43,11 @@ func GenerateProjectNames(projectName string) []string {
 }
 
 func GenerateDotnetSolution(ctx context.Context, solutionName string, location string) error {
-	err := runDotnetCommand(ctx, location, "new", "sln", "-n", solutionName)
-	if err != nil {
+	if err := os.MkdirAll(location, 0o755); err != nil {
+		return err
+	}
+
+	if err := runDotnetCommand(ctx, location, "new", "sln", "-n", solutionName); err != nil {
 		return err
 	}
 
