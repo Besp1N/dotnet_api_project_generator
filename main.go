@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"dotnetApiGenerator/dotnetproject"
 	"fmt"
 )
 
 func main() {
+	ctx := context.Background()
 	fmt.Print("Enter project name: ")
 
 	var projectName string
@@ -30,10 +32,14 @@ func main() {
 	fmt.Println(len(projectNames), "projects will be created in", location, ":")
 	for _, name := range projectNames {
 		fmt.Println("- " + name)
-		dotnetProject := dotnetproject.New(name, location)
+		dotnetProject := dotnetproject.New(name)
 		dotnetProjects = append(dotnetProjects, dotnetProject)
 	}
 
 	fmt.Println()
 
+	err = dotnetproject.GenerateDotnetSolution(ctx, projectName, location)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

@@ -2,21 +2,20 @@ package dotnetproject
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 )
 
 type DotnetProject struct {
 	Name          string
-	Location      string
 	Dependencies  []string
 	NuGetPackages []string
 }
 
-func New(name string, location string) *DotnetProject {
+func New(name string) *DotnetProject {
 	return &DotnetProject{
-		Name:     name,
-		Location: location,
+		Name: name,
 	}
 }
 
@@ -26,7 +25,7 @@ func runDotnetCommand(ctx context.Context, workingDir string, args ...string) er
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		panic("Failed to run dotnet command: " + string(out))
+		return errors.New("failed to run dotnet command: " + string(out))
 	}
 
 	return nil
@@ -40,4 +39,13 @@ func GenerateProjectNames(projectName string) []string {
 		fmt.Sprintf("%s.Infrastructure", projectName),
 		fmt.Sprintf("%s.Worker", projectName),
 	}
+}
+
+func GenerateDotnetSolution(ctx context.Context, solutionName string, location string) error {
+	err := runDotnetCommand(ctx, location, "new", "sln", "-n", solutionName)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
