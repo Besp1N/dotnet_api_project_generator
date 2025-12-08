@@ -10,7 +10,7 @@ import (
 
 type DotnetProject struct {
 	Name          string
-	Dependencies  []string
+	Dependencies  []*DotnetProject
 	NuGetPackages []string
 }
 
